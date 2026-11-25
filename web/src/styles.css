@@ -1973,7 +1973,7 @@ p {
 .transaction-history-table { width: max-content; min-width: 100%; border-collapse: collapse; text-align: left; white-space: nowrap; }
 .transaction-history-table thead { background: var(--color-surface-soft); }
 .transaction-history-table th { height: 46px; padding: 0 18px; color: var(--color-neutral-muted); border-bottom: 1px solid var(--color-border); font-size: 10px; font-weight: 700; letter-spacing: .035em; text-transform: uppercase; }
-.transaction-history-table td { min-height: 64px; padding: 12px 18px; color: var(--color-neutral); border-bottom: 1px solid var(--color-border-subtle); font-size: 13px; vertical-align: middle; }
+.transaction-history-table td { min-height: 64px; padding: 12px 18px; color: var(--color-neutral); border-bottom: 1px solid var(--color-border-subtle); font-size: 11px; vertical-align: middle; }
 .transaction-history-table tbody tr:last-child td { border-bottom: 0; }
 .transaction-history-table tbody tr:hover { background: var(--color-surface-soft); }
 .transaction-history-date-time { min-width: 190px; }
