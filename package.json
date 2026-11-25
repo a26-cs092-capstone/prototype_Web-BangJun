@@ -1,0 +1,19 @@
+{
+  "name": "prototype-web-bangjun",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Prototype backend + frontend Digitalisasi Stok Kedai Bang Jun",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "build": "npm install --prefix web && npm run build --prefix web",
+    "check": "node --check server/index.js && node --check server/api.js && node --check server/db.js && node --check server/mapping.js"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "engines": {
+    "node": ">=22.5.0"
+  }
+}
