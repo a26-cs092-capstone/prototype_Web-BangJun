@@ -13,9 +13,9 @@
 |----------|-------|
 | 🔴 Critical | 0 |
 | 🟠 High | 0 |
-| 🟡 Medium | 3 (fixed) |
+| 🟡 Medium | 5 (fixed) |
 | 🔵 Low | 1 (fixed) |
-| **Total** | **4** |
+| **Total** | **6** |
 
 **Overall Assessment:** Semua alur utama berfungsi, tidak ada console error, tabel kini konsisten dengan Dashboard dan lega di semua ukuran HP yang diuji.
 
@@ -121,3 +121,37 @@ Tidak ada.
 - Emoji tetap ditolak untuk input baru, tetapi data lama yang sudah mengandung emoji tidak dihapus dan bisa diarsipkan.
 - Data B017 sudah diarsipkan sesuai percobaan pengguna. B018 tidak diubah.
 - Semua perubahan sudah di-push dan terlayani di URL publik.
+
+---
+
+## Temuan Tambahan Putaran Akhir
+
+### Issue #5: Riwayat hanya menampilkan 1000 dari 1420 transaksi
+
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟡 Medium |
+| **Category** | Functional |
+
+**Description:** PostgREST Supabase membatasi 1000 baris per respons. Frontend meminta 2000 baris, tetapi hanya menerima 1000, sehingga filter dan pencarian tidak mencakup seluruh transaksi.
+
+**Resolution:** `server/store.js` kini mengambil data dalam potongan 1000 baris hingga mencapai total jumlah dari header `Content-Range`.
+
+**Verification:** API mengembalikan `total 1420, items 1420`; UI menampilkan "Total Transaksi: 1420 Catatan".
+
+### Issue #6: Teks dialog arsip masih menyebut mock state
+
+| Field | Value |
+|-------|-------|
+| **Severity** | 🔵 Low |
+| **Category** | Content |
+
+**Description:** Dialog konfirmasi penghapusan menyatakan data disimpan dalam mock state, padahal kini tersimpan di Supabase.
+
+**Resolution:** Teks diubah menjadi "Data tetap tersimpan di database agar referensi riwayat transaksi terjaga."
+
+### Catatan Operasional
+Saat QA, server sempat mati dan tunnel menampilkan 502 Bad Gateway. Server sudah dinyalakan lagi dan URL publik kembali HTTP 200.
+
+### Kompromi Tabel Mobile
+Tabel tetap bisa digeser horizontal seperti Dashboard. Untuk mengurangi zoom, kolom kurang penting disembunyikan dan padding diatur 11px 12px. Di 393px, `innerWidth` 433 (Bahan Baku) dan 463 (Riwayat), wrapper tetap bisa digeser, dan `window.scrollX` tetap 0 saat halaman dicoba digeser.

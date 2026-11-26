@@ -2124,3 +2124,25 @@ p {
   -webkit-overflow-scrolling: touch;
 }
 html, body { overflow-x: clip; }
+
+/* Mobile: tabel tetap bisa digeser, kolom kurang penting disembunyikan agar zoom tidak berlebih */
+@media (max-width: 768px) {
+  .materials-table th:nth-child(3),
+  .materials-table td:nth-child(3),
+  .materials-table th:nth-child(4),
+  .materials-table td:nth-child(4),
+  .transaction-history-table th:nth-child(3),
+  .transaction-history-table td:nth-child(3),
+  .transaction-history-table th:nth-child(5),
+  .transaction-history-table td:nth-child(5),
+  .transaction-history-table th:nth-child(6),
+  .transaction-history-table td:nth-child(6) {
+    display: none;
+  }
+  .materials-table th,
+  .materials-table td,
+  .transaction-history-table th,
+  .transaction-history-table td {
+    padding: 11px 12px !important;
+  }
+}

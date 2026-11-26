@@ -430,7 +430,7 @@ function BahanBaku({ materials, setMaterials, reload }) {
         {pendingDelete && (
           <>
             <h2 id="delete-material-title">Hapus bahan baku?</h2>
-            <p>Bahan “{pendingDelete.name}” akan dihapus dari daftar aktif. Data bahan disimpan dalam mock state agar referensi riwayat tetap terjaga.</p>
+            <p>Bahan “{pendingDelete.name}” akan dihapus dari daftar aktif. Data tetap tersimpan di database agar referensi riwayat transaksi terjaga.</p>
             <div className="materials-dialog-actions">
               <button ref={cancelDialogButtonRef} type="button" className="materials-cancel-button" onClick={closeDeleteDialog}>Batal</button>
               <button type="button" className="materials-delete-button" onClick={confirmDelete}>Ya, Hapus</button>

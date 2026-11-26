@@ -79,7 +79,7 @@ api.patch('/materials/:id', wrap(async (req, res) => {
 
 api.get('/transactions', wrap(async (req, res) => {
   const { search = '', type = '', from = '', to = '', page = '1', pageSize = '8' } = req.query
-  const size = Math.min(Math.max(Number(pageSize) || 8, 1), 100)
+  const size = Math.min(Math.max(Number(pageSize) || 8, 1), 5000)
   const p = Math.max(Number(page) || 1, 1)
   const dbType = type ? (TYPE_TO_DB[type] || type) : ''
   const { items, total } = await store.listTransactions({ search, type: dbType, from, to, page: p, pageSize: size })

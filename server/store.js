@@ -94,9 +94,20 @@ export async function listTransactions({ search, type, from, to, page, pageSize 
     const term = String(search).replace(/[%,()]/g, ' ')
     params.or = `(ingredient_name.ilike.*${term}*,notes.ilike.*${term}*)`
   }
-  const r = await request('v_riwayat_stok', { params, count: true })
-  const total = Number(String(r.range || '').split('/')[1]) || 0
-  return { items: r.data || [], total }
+  const first = await request('v_riwayat_stok', { params, count: true })
+  const total = Number(String(first.range || '').split('/')[1]) || 0
+  let items = first.data || []
+  const CAP = 1000
+  if (items.length === CAP && params.limit > CAP) {
+    while (items.length < total && items.length < params.limit) {
+      const nextParams = { ...params, offset: (params.offset || 0) + items.length }
+      const chunk = await request('v_riwayat_stok', { params: nextParams })
+      if (!chunk.data || chunk.data.length === 0) break
+      items = items.concat(chunk.data)
+      if (chunk.data.length < CAP) break
+    }
+  }
+  return { items: items.slice(0, params.limit), total }
 }
 
 export async function getTransaction(id) {
