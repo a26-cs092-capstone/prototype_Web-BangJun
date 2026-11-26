@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router'
 import { createPortal } from 'react-dom'
 import { api } from '../api'
@@ -157,6 +157,13 @@ function BahanBaku({ materials, setMaterials, reload }) {
 
   const pageCount = Math.max(1, Math.ceil(sortedMaterials.length / PAGE_SIZE))
   const visiblePage = Math.min(page, pageCount)
+  const compactPages = useMemo(() => {
+    const pages = new Set([1, pageCount])
+    for (let p = visiblePage - 1; p <= visiblePage + 1; p += 1) {
+      if (p >= 1 && p <= pageCount) pages.add(p)
+    }
+    return [...pages].sort((a, b) => a - b)
+  }, [visiblePage, pageCount])
   const pageItems = sortedMaterials.slice((visiblePage - 1) * PAGE_SIZE, visiblePage * PAGE_SIZE)
   const menuMaterial = pageItems.find((material) => material.id === openMenuId)
   const firstItem = sortedMaterials.length === 0 ? 0 : (visiblePage - 1) * PAGE_SIZE + 1
@@ -316,10 +323,6 @@ function BahanBaku({ materials, setMaterials, reload }) {
           </p>
         </div>
 
-        <p className="materials-scroll-hint">
-          Geser tabel ke samping untuk melihat kolom lainnya.
-        </p>
-
         <div className="materials-table-scroll" ref={materialsTableRef} tabIndex={-1}>
           <table className="materials-table">
             <thead>
@@ -380,17 +383,21 @@ function BahanBaku({ materials, setMaterials, reload }) {
           <p>Menampilkan <strong>{firstItem}–{lastItem}</strong> dari <strong>{sortedMaterials.length}</strong> bahan baku</p>
           <nav aria-label="Navigasi halaman daftar bahan baku" className="materials-page-controls">
             <button type="button" disabled={visiblePage <= 1} onClick={() => setPage(visiblePage - 1)}>Sebelumnya</button>
-            {Array.from({ length: pageCount }, (_, index) => index + 1).map((pageNumber) => (
-              <button
-                type="button"
-                key={pageNumber}
-                className={pageNumber === visiblePage ? 'current' : ''}
-                aria-current={pageNumber === visiblePage ? 'page' : undefined}
-                aria-label={`Halaman ${pageNumber}`}
-                onClick={() => setPage(pageNumber)}
-              >
-                {pageNumber}
-              </button>
+            {compactPages.map((pageNumber, index) => (
+              <Fragment key={pageNumber}>
+                {index > 0 && pageNumber - compactPages[index - 1] > 1 && (
+                  <span className="page-ellipsis" aria-hidden="true">…</span>
+                )}
+                <button
+                  type="button"
+                  className={pageNumber === visiblePage ? 'current' : ''}
+                  aria-current={pageNumber === visiblePage ? 'page' : undefined}
+                  aria-label={`Halaman ${pageNumber}`}
+                  onClick={() => setPage(pageNumber)}
+                >
+                  {pageNumber}
+                </button>
+              </Fragment>
             ))}
             <button type="button" disabled={visiblePage >= pageCount} onClick={() => setPage(visiblePage + 1)}>Berikutnya</button>
           </nav>

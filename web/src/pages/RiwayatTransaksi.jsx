@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { Fragment, useMemo, useState } from 'react'
 import { Link } from 'react-router'
 import { Eye, History, Search } from 'lucide-react'
 
@@ -62,6 +62,16 @@ function RiwayatTransaksi({ stockTransactions }) {
 
   const pageCount = Math.max(1, Math.ceil(filteredTransactions.length / PAGE_SIZE))
   const visiblePage = Math.min(page, pageCount)
+
+  // Pagination ringkas: angka pertama, angka di sekitar halaman aktif, elipsis, angka terakhir
+  const compactPages = useMemo(() => {
+    const pages = new Set([1, pageCount])
+    for (let p = visiblePage - 1; p <= visiblePage + 1; p += 1) {
+      if (p >= 1 && p <= pageCount) pages.add(p)
+    }
+    return [...pages].sort((a, b) => a - b)
+  }, [visiblePage, pageCount])
+
   const pageTransactions = filteredTransactions.slice(
     (visiblePage - 1) * PAGE_SIZE,
     visiblePage * PAGE_SIZE,
@@ -188,17 +198,21 @@ function RiwayatTransaksi({ stockTransactions }) {
           <p>Menampilkan <strong>{firstItem}–{lastItem}</strong> dari <strong>{filteredTransactions.length}</strong> transaksi</p>
           <nav className="transaction-history-page-controls" aria-label="Navigasi halaman riwayat transaksi">
             <button type="button" disabled={visiblePage <= 1} onClick={() => setPage(visiblePage - 1)}>Sebelumnya</button>
-            {Array.from({ length: pageCount }, (_, index) => index + 1).map((pageNumber) => (
-              <button
-                type="button"
-                key={pageNumber}
-                className={pageNumber === visiblePage ? 'current' : ''}
-                aria-current={pageNumber === visiblePage ? 'page' : undefined}
-                aria-label={`Halaman ${pageNumber}`}
-                onClick={() => setPage(pageNumber)}
-              >
-                {pageNumber}
-              </button>
+            {compactPages.map((pageNumber, index) => (
+              <Fragment key={pageNumber}>
+                {index > 0 && pageNumber - compactPages[index - 1] > 1 && (
+                  <span className="page-ellipsis" aria-hidden="true">…</span>
+                )}
+                <button
+                  type="button"
+                  className={pageNumber === visiblePage ? 'current' : ''}
+                  aria-current={pageNumber === visiblePage ? 'page' : undefined}
+                  aria-label={`Halaman ${pageNumber}`}
+                  onClick={() => setPage(pageNumber)}
+                >
+                  {pageNumber}
+                </button>
+              </Fragment>
             ))}
             <button type="button" disabled={visiblePage >= pageCount} onClick={() => setPage(visiblePage + 1)}>Berikutnya</button>
           </nav>
