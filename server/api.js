@@ -52,15 +52,20 @@ api.post('/materials', wrap(async (req, res) => {
 api.patch('/materials/:id', wrap(async (req, res) => {
   const row = await store.getMaterial(req.params.id)
   if (!row) return fail(res, 404, 'Bahan baku tidak ditemukan.')
-  const name = req.body?.name ?? row.ingredient_name
-  const unit = req.body?.unit ?? row.stock_unit
-  const minimumStock = req.body?.minimumStock ?? row.stok_minimum
+  const nameProvided = req.body?.name !== undefined
+  const unitProvided = req.body?.unit !== undefined
+  const minProvided = req.body?.minimumStock !== undefined
+  const name = nameProvided ? req.body.name : row.ingredient_name
+  const unit = unitProvided ? req.body.unit : row.stock_unit
+  const minimumStock = minProvided ? req.body.minimumStock : row.stok_minimum
   const active = req.body?.active === undefined ? row.is_aktif : Boolean(req.body.active)
-  if (!name || !String(name).trim()) return fail(res, 400, 'Nama bahan baku wajib diisi.')
-  else if (hasEmoji(name)) return fail(res, 400, 'Emoji tidak diperbolehkan pada nama bahan baku.')
-  if (!unit || !String(unit).trim()) return fail(res, 400, 'Satuan wajib dipilih.')
+  if (nameProvided) {
+    if (!name || !String(name).trim()) return fail(res, 400, 'Nama bahan baku wajib diisi.')
+    else if (hasEmoji(name)) return fail(res, 400, 'Emoji tidak diperbolehkan pada nama bahan baku.')
+  }
+  if (unitProvided && (!unit || !String(unit).trim())) return fail(res, 400, 'Satuan wajib dipilih.')
   const min = Number(minimumStock)
-  if (!Number.isFinite(min) || min < 0) return fail(res, 400, 'Stok minimum tidak valid.')
+  if (minProvided && (!Number.isFinite(min) || min < 0)) return fail(res, 400, 'Stok minimum tidak valid.')
   await store.updateMaterial(req.params.id, {
     ingredient_name: String(name).trim(),
     stock_unit: String(unit).trim(),

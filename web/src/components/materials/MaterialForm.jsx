@@ -74,7 +74,7 @@ function MaterialForm({ mode, materials, setMaterials, material, reload }) {
     if (!trimmedName) nextErrors.name = 'Nama bahan baku wajib diisi.'
     else if (trimmedName.length > 60) nextErrors.name = 'Nama bahan baku maksimal 60 karakter.'
     else if (duplicate) nextErrors.name = 'Nama bahan baku sudah digunakan.'
-    else if (containsEmoji(trimmedName)) nextErrors.name = 'Emoji tidak diperbolehkan pada nama bahan baku.'
+    else if (containsEmoji(trimmedName) && trimmedName !== material?.name) nextErrors.name = 'Emoji tidak diperbolehkan pada nama bahan baku.'
 
     if (!unit) nextErrors.unit = 'Satuan wajib dipilih.'
     if (minimumStock === '' || !Number.isFinite(parsedMinimum)) {
