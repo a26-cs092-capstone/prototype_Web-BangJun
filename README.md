@@ -4,13 +4,29 @@ Prototype frontend + backend untuk Digitalisasi Pengelolaan Stok Bahan Baku Keda
 
 Ini **prototype**: data awal bersifat sintetis dari tim Data Science, bukan data operasional kedai.
 
+## Teknologi
+
+| Lapisan | Framework / library | Versi |
+|---|---|---|
+| Frontend | React | 19 |
+| Build tool | Vite | 8 |
+| Styling | Tailwind CSS | 4 |
+| Routing | React Router | 8 |
+| Ikon | Lucide React | — |
+| Grafik | Recharts | 3 (terpasang, belum dipakai) |
+| Backend | Express | 5 |
+| Database | Supabase PostgreSQL (PostgREST) | — |
+| Bahasa | JavaScript (ESM), Node.js 20+ | — |
+
+Struktur: `web/` (frontend) dan `server/` (backend). Backend memakai Supabase REST, bukan SQLite untuk data produksi.
+
 ## Isi
 
 - `web/` — frontend React 19 + Vite 8 + Tailwind 4 (dari repo `web-kedai-bang-jun`).
 - `server/` — backend Express 5 + `node:sqlite` (SQLite bawaan Node.js 22+).
 - `server/store.js` — lapisan akses data ke Supabase REST (PostgREST).
 - `server/schema.sql` — referensi schema SQLite lama; schema produksi ada di repo database.
-- `server/prepare-supabase.js` — sekali jalan untuk mengisi `stok_minimum` demo dan menonaktifkan bahan GROUP.
+- `server/prepare-supabase.js` — sekali jalan untuk mengisi `stok_minimum` demo.
 - `.env` — berisi `SUPABASE_URL` dan `SUPABASE_SERVICE_KEY` (rahasia, tidak di-commit).
 
 ## Menjalankan
@@ -44,8 +60,8 @@ Hal yang belum disepakati tim, dipilih berikut agar prototype bisa berjalan:
 
 1. **Data awal**: 16 bahan dan 1.417 transaksi sintetik dari tim Data Science dipakai sebagai demo.
 2. **Nama bahan**: memakai nama dari dataset (`Beras`, `Dada ayam`), bukan 28 nama fixture frontend.
-3. **Bahan GROUP** (`Bumbu-bumbu`, `Saus-saus`, `Sambal-sambal`) ditandai nonaktif karena `is_stockable = false`; tidak bisa ditransaksikan.
-4. **`stok_minimum`**: dataset tidak punya nilai, jadi prototype memakai ambang demo di `server/db.js` (`DEMO_MINIMUM`). Total hanya 13 bahan aktif yang dihitung.
+3. **Bahan GROUP** (`Bumbu-bumbu`, `Saus-saus`, `Sambal-sambal`) tetap ditampilkan di daftar bahan, tetapi tidak bisa ditransaksikan karena `is_stockable = false`.
+4. **`stok_minimum`**: dataset tidak punya nilai, jadi prototype memakai ambang demo di `server/db.js` (`DEMO_MINIMUM`). Ke-16 bahan dihitung, termasuk 3 kelompok GROUP.
 5. **Aturan status**: memakai aturan view database (`BELUM_DIATUR`, `Kritis` <= 50% minimum, `Menipis` <= minimum, `Normal`).
 6. **Alasan stok masuk**: transaksi pertama untuk bahan menjadi `STOK_AWAL`, berikutnya `PEMBELIAN`.
 7. **Alasan stok keluar**: dropdown frontend (5 opsi) dipetakan ke enum database (`PENGGUNAAN` / `RUSAK_TERBUANG`).
@@ -95,4 +111,4 @@ Karena prototype tidak punya autentikasi, bagikan URL hanya kepada orang yang di
 - Data sintetik harus diganti sebelum dipakai operasional.
 - Backend memakai Supabase REST dengan service key, sehingga tabel bisa dibaca dan ditulis meskipun RLS aktif untuk publishable key.
 - Data awal sudah ada di Supabase: 16 bahan dan 1.417 transaksi sintetik.
-- `stok_minimum` diisi nilai demo oleh `server/prepare-supabase.js`; 3 bahan GROUP dinonaktifkan karena tidak bisa ditransaksikan.
+- `stok_minimum` diisi nilai demo oleh `server/prepare-supabase.js`; 3 bahan GROUP tetap tampil tetapi tidak bisa ditransaksikan.
