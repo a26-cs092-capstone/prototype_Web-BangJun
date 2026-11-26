@@ -71,9 +71,9 @@
 
 **Description:** Perbaikan overflow sebelumnya memakai padding 10px 8px sehingga sel terlihat sempit.
 
-**Resolution:** Padding mobile dinaikkan menjadi 11px 12px. Kolom kurang penting tetap disembunyikan agar tidak overflow.
+**Resolution:** Awalnya kolom disembunyikan dan tabel dipaksa muat. Setelah masukan reviewer, perilaku diubah agar tabel bisa digeser horizontal seperti Dashboard. Halaman dicegah ikut bergeser dengan `overflow-x: clip` pada html/body.
 
-**Verification:** Enam ukuran HP (360x800, 375x667, 390x844, 412x915, 430x932, 768x1024) menunjukkan scrollWidth sama dengan clientWidth pada Dashboard, Bahan Baku, dan Riwayat Transaksi.
+**Verification:** Di 390px, wrapper tabel Bahan Baku `scrollWidth 693 / clientWidth 356` dan Riwayat `984 / 356`. `scrollLeft` bisa diatur ke 180 pada keduanya, sementara `window.scrollX` tetap 0 saat halaman dicoba digeser.
 
 ---
 
@@ -96,7 +96,7 @@
 |---|-------|----------|----------|--------|
 | 1 | Arsip bahan beremoji ditolak | Medium | Functional | Fixed |
 | 2 | Tabel halaman lain beda dari Dashboard | Medium | Visual | Fixed |
-| 3 | Tabel mepet di HP | Medium | Visual | Fixed |
+| 3 | Tabel tidak bisa digeser seperti Dashboard | Medium | Visual | Fixed |
 | 4 | Rute tidak dikenal kosong | Low | UX | Fixed |
 
 ## Testing Coverage
