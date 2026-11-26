@@ -3,6 +3,7 @@ import { Link } from 'react-router'
 import { ArrowDownToLine, Info } from 'lucide-react'
 import { useToast } from '../components/ui/ToastProvider'
 import { api } from '../api'
+import { containsEmoji } from '../validation'
 
 const WITA_TIME_ZONE = 'Asia/Makassar'
 
@@ -60,6 +61,7 @@ function StokMasuk({ materials, setMaterials, stockTransactions, setStockTransac
     if (!date) nextErrors.date = 'Tanggal transaksi wajib diisi.'
     if (!time) nextErrors.time = 'Waktu transaksi wajib diisi.'
     if (notes.length > 250) nextErrors.notes = 'Keterangan maksimal 250 karakter.'
+    else if (containsEmoji(notes)) nextErrors.notes = 'Keterangan tidak boleh mengandung emoji.'
 
     setErrors(nextErrors)
     if (Object.keys(nextErrors).length > 0) return

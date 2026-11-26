@@ -6,6 +6,9 @@ export const api = Router()
 const fail = (res, status, message) => res.status(status).json({ error: message })
 const wrap = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch(next)
 
+const EMOJI = /\p{Extended_Pictographic}|\p{Emoji_Presentation}/u
+const hasEmoji = (value) => EMOJI.test(String(value ?? ''))
+
 api.get('/materials', wrap(async (req, res) => {
   const rows = await store.listMaterials()
   res.json(rows.map(materialToFE))
@@ -21,6 +24,7 @@ api.get('/materials/:id', wrap(async (req, res) => {
 api.post('/materials', wrap(async (req, res) => {
   const { name, unit, minimumStock } = req.body || {}
   if (!name || !String(name).trim()) return fail(res, 400, 'Nama bahan baku wajib diisi.')
+  else if (hasEmoji(name)) return fail(res, 400, 'Emoji tidak diperbolehkan pada nama bahan baku.')
   if (!unit || !String(unit).trim()) return fail(res, 400, 'Satuan wajib dipilih.')
   const min = Number(minimumStock)
   if (!Number.isFinite(min) || min < 0) return fail(res, 400, 'Stok minimum harus angka nonnegatif.')
@@ -53,6 +57,7 @@ api.patch('/materials/:id', wrap(async (req, res) => {
   const minimumStock = req.body?.minimumStock ?? row.stok_minimum
   const active = req.body?.active === undefined ? row.is_aktif : Boolean(req.body.active)
   if (!name || !String(name).trim()) return fail(res, 400, 'Nama bahan baku wajib diisi.')
+  else if (hasEmoji(name)) return fail(res, 400, 'Emoji tidak diperbolehkan pada nama bahan baku.')
   if (!unit || !String(unit).trim()) return fail(res, 400, 'Satuan wajib dipilih.')
   const min = Number(minimumStock)
   if (!Number.isFinite(min) || min < 0) return fail(res, 400, 'Stok minimum tidak valid.')
@@ -100,6 +105,7 @@ async function validateCommon(body) {
 api.post('/transactions/stock-in', wrap(async (req, res) => {
   const v = await validateCommon(req.body)
   if (v.error) return fail(res, 400, v.error)
+  if (hasEmoji(req.body.notes)) return fail(res, 400, 'Keterangan tidak boleh mengandung emoji.')
   const hasPrevious = await store.hasTransaction(req.body.materialId)
   const id = await store.nextTransactionId()
   await store.createTransaction({
@@ -122,6 +128,7 @@ api.post('/transactions/stock-in', wrap(async (req, res) => {
 api.post('/transactions/stock-out', wrap(async (req, res) => {
   const v = await validateCommon(req.body)
   if (v.error) return fail(res, 400, v.error)
+  if (hasEmoji(req.body.notes)) return fail(res, 400, 'Keterangan tidak boleh mengandung emoji.')
   const reason = REASON_TO_DB[req.body.reason]
   if (!reason) return fail(res, 400, 'Alasan stok keluar tidak dikenal.')
   const available = Number(v.material.stok_saat_ini) || 0

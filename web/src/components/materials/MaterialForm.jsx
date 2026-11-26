@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router'
 import { AlertCircle, Check, Info, Package } from 'lucide-react'
 import { useToast } from '../ui/ToastProvider'
 import { api } from '../../api'
+import { containsEmoji } from '../../validation'
 
 const units = ['kg', 'gram', 'liter', 'ml', 'bungkus', 'pack', 'karung', 'piring', 'butir']
 
@@ -73,6 +74,7 @@ function MaterialForm({ mode, materials, setMaterials, material, reload }) {
     if (!trimmedName) nextErrors.name = 'Nama bahan baku wajib diisi.'
     else if (trimmedName.length > 60) nextErrors.name = 'Nama bahan baku maksimal 60 karakter.'
     else if (duplicate) nextErrors.name = 'Nama bahan baku sudah digunakan.'
+    else if (containsEmoji(trimmedName)) nextErrors.name = 'Emoji tidak diperbolehkan pada nama bahan baku.'
 
     if (!unit) nextErrors.unit = 'Satuan wajib dipilih.'
     if (minimumStock === '' || !Number.isFinite(parsedMinimum)) {
