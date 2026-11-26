@@ -61,6 +61,7 @@ function AppRoutes() {
         <Route path="/riwayat-transaksi" element={<RiwayatTransaksi stockTransactions={stockTransactions} />} />
         <Route path="/riwayat-transaksi/:id" element={<DetailTransaksi stockTransactions={stockTransactions} />} />
         <Route path="/ai-assistant" element={<Placeholder title="AI Stock Assistant" />} />
+        <Route path="*" element={<Placeholder title="Halaman Tidak Ditemukan" />} />
       </Route>
     </Routes>
   )
