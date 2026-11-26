@@ -2074,22 +2074,45 @@ p {
   .transaction-not-found { margin: 24px auto; padding: 24px 18px; }
 }
 
-/* QA fix: mobile tables must not expand the layout viewport */
+/* QA fix: mobile tables stay inside the viewport while keeping a clean dashboard-like row layout */
 @media (max-width: 768px) {
   .materials-table,
   .transaction-history-table {
     width: 100% !important;
     min-width: 0 !important;
     table-layout: fixed;
-    white-space: normal !important;
+    white-space: nowrap !important;
   }
   .materials-table th,
   .materials-table td,
   .transaction-history-table th,
   .transaction-history-table td {
-    padding: 8px 6px !important;
-    word-break: break-word;
-    overflow-wrap: anywhere;
+    padding: 10px 8px !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
+  .materials-table th:nth-child(3),
+  .materials-table td:nth-child(3),
+  .materials-table th:nth-child(4),
+  .materials-table td:nth-child(4),
+  .transaction-history-table th:nth-child(3),
+  .transaction-history-table td:nth-child(3),
+  .transaction-history-table th:nth-child(5),
+  .transaction-history-table td:nth-child(5),
+  .transaction-history-table th:nth-child(6),
+  .transaction-history-table td:nth-child(6) {
+    display: none;
+  }
+  .materials-table th:nth-child(1),
+  .materials-table th:nth-child(2),
+  .transaction-history-table th:nth-child(1),
+  .transaction-history-table th:nth-child(2) {
+    font-size: 0 !important;
+  }
+  .materials-table th:nth-child(1)::after { content: 'NAMA'; font-size: 10px; }
+  .materials-table th:nth-child(2)::after { content: 'STOK'; font-size: 10px; }
+  .materials-scroll-hint { display: none; }
+  .transaction-history-table th:nth-child(1)::after { content: 'TANGGAL'; font-size: 10px; }
+  .transaction-history-table th:nth-child(2)::after { content: 'BAHAN'; font-size: 10px; }
   .transaction-history-date-time { min-width: 0 !important; }
 }
