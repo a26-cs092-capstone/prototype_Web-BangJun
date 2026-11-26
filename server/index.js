@@ -2,15 +2,19 @@ import express from 'express'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { seed } from './db.js'
+import { listMaterials } from './store.js'
 import { api } from './api.js'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
 const root = path.resolve(here, '..')
 const dist = path.join(root, 'web', 'dist')
 
-const info = seed()
-console.log(`[kedai] database ready: ${info.materials} bahan, ${info.transactions} transaksi${info.seeded ? ' (seeded)' : ''}`)
+try {
+  const materials = await listMaterials()
+  console.log(`[kedai] Supabase ready: ${materials.length} bahan`)
+} catch (e) {
+  console.error('[kedai] Supabase connection failed:', e.message)
+}
 
 const app = express()
 app.disable('x-powered-by')

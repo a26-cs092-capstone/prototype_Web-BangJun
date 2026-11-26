@@ -8,13 +8,22 @@ Ini **prototype**: data awal bersifat sintetis dari tim Data Science, bukan data
 
 - `web/` — frontend React 19 + Vite 8 + Tailwind 4 (dari repo `web-kedai-bang-jun`).
 - `server/` — backend Express 5 + `node:sqlite` (SQLite bawaan Node.js 22+).
-- `server/schema.sql` — schema yang mengikuti `schema_v2.sql` dari repo database.
-- `server/bahan_baku.csv`, `server/transaksi_stok.csv` — dataset sintetik tim Data Science.
-- `data/kedai.db` — database SQLite, dibuat otomatis saat pertama kali dijalankan (tidak di-commit).
+- `server/store.js` — lapisan akses data ke Supabase REST (PostgREST).
+- `server/schema.sql` — referensi schema SQLite lama; schema produksi ada di repo database.
+- `server/prepare-supabase.js` — sekali jalan untuk mengisi `stok_minimum` demo dan menonaktifkan bahan GROUP.
+- `.env` — berisi `SUPABASE_URL` dan `SUPABASE_SERVICE_KEY` (rahasia, tidak di-commit).
 
 ## Menjalankan
 
-Butuh Node.js minimal 22.5 (dipakai `node:sqlite`). Di mesin ini terpasang Node 26.
+Butuh Node.js 20+ dan koneksi ke project Supabase `db-stok-bahan-baku-kedai-bang-jun`.
+Salin kredensial ke `.env`:
+
+```
+SUPABASE_URL=https://<ref>.supabase.co
+SUPABASE_SERVICE_KEY=<secret key>
+```
+
+Jangan pernah commit `.env`.
 
 ```bash
 npm install
@@ -84,4 +93,6 @@ Karena prototype tidak punya autentikasi, bagikan URL hanya kepada orang yang di
 - Dashboard masih menampilkan placeholder untuk dua panel grafik ( Recharts belum dipakai).
 - AI Stock Assistant masih placeholder.
 - Data sintetik harus diganti sebelum dipakai operasional.
-- Database SQLite dipakai supaya prototype bisa jalan tanpa Supabase. Schema dan aturannya mengikuti schema PostgreSQL tim database; logic bisnis ada di `server/api.js`.
+- Backend memakai Supabase REST dengan service key, sehingga tabel bisa dibaca dan ditulis meskipun RLS aktif untuk publishable key.
+- Data awal sudah ada di Supabase: 16 bahan dan 1.417 transaksi sintetik.
+- `stok_minimum` diisi nilai demo oleh `server/prepare-supabase.js`; 3 bahan GROUP dinonaktifkan karena tidak bisa ditransaksikan.
