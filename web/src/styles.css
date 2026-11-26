@@ -2077,7 +2077,6 @@ p {
 /* Samakan tabel halaman lain dengan tabel Dashboard */
 .materials-table,
 .transaction-history-table {
-  width: 100%;
   border-collapse: collapse;
   text-align: left;
   white-space: nowrap;
@@ -2115,45 +2114,13 @@ p {
 }
 .transaction-history-table tbody td:first-child { font-weight: 500; }
 
-/* QA fix: mobile tables stay inside the viewport while keeping a clean dashboard-like row layout */
-@media (max-width: 768px) {
-  .materials-table,
-  .transaction-history-table {
-    width: 100% !important;
-    min-width: 0 !important;
-    table-layout: fixed;
-    white-space: nowrap !important;
-  }
-  .materials-table th,
-  .materials-table td,
-  .transaction-history-table th,
-  .transaction-history-table td {
-    padding: 11px 12px !important;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .materials-table th:nth-child(3),
-  .materials-table td:nth-child(3),
-  .materials-table th:nth-child(4),
-  .materials-table td:nth-child(4),
-  .transaction-history-table th:nth-child(3),
-  .transaction-history-table td:nth-child(3),
-  .transaction-history-table th:nth-child(5),
-  .transaction-history-table td:nth-child(5),
-  .transaction-history-table th:nth-child(6),
-  .transaction-history-table td:nth-child(6) {
-    display: none;
-  }
-  .materials-table th:nth-child(1),
-  .materials-table th:nth-child(2),
-  .transaction-history-table th:nth-child(1),
-  .transaction-history-table th:nth-child(2) {
-    font-size: 0 !important;
-  }
-  .materials-table th:nth-child(1)::after { content: 'NAMA'; font-size: 10px; }
-  .materials-table th:nth-child(2)::after { content: 'STOK'; font-size: 10px; }
-  .materials-scroll-hint { display: none; }
-  .transaction-history-table th:nth-child(1)::after { content: 'TANGGAL'; font-size: 10px; }
-  .transaction-history-table th:nth-child(2)::after { content: 'BAHAN'; font-size: 10px; }
-  .transaction-history-date-time { min-width: 0 !important; }
+
+/* Samakan perilaku geser tabel dengan Dashboard: tabel lebih lebar dari wrapper, halaman tidak ikut bergeser */
+.materials-table-scroll,
+.transaction-history-table-scroll {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
+html, body { overflow-x: clip; }
