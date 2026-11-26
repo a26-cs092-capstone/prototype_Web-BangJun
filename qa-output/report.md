@@ -1,8 +1,8 @@
-# Dogfood QA Report
+# Dogfood QA Report (Final)
 
 **Target:** https://arms-xhtml-modified-constraints.trycloudflare.com
-**Date:** 2026-11-26
-**Scope:** Seluruh halaman prototype (Dashboard, Bahan Baku, Stok Masuk, Stok Keluar, Riwayat Transaksi, Detail, AI Assistant), uji fungsional, validasi form, emulasi perangkat, dan rute tidak dikenal.
+**Date:** 2026-11-27
+**Scope:** Seluruh halaman, alur utama, validasi input, tabel lintas perangkat, dan integrasi Supabase.
 **Tester:** Hermes Agent (automated exploratory QA via `dogfood` + CDP)
 
 ---
@@ -13,105 +13,111 @@
 |----------|-------|
 | 🔴 Critical | 0 |
 | 🟠 High | 0 |
-| 🟡 Medium | 1 (fixed) |
+| 🟡 Medium | 3 (fixed) |
 | 🔵 Low | 1 (fixed) |
-| **Total** | **2** |
+| **Total** | **4** |
 
-**Overall Assessment:** Aplikasi stabil, tanpa console error, dan semua alur utama berfungsi. Dua temuan QA berupa viewport mobile yang melebar dan halaman 404 kosong sudah diperbaiki serta terverifikasi ulang.
+**Overall Assessment:** Semua alur utama berfungsi, tidak ada console error, tabel kini konsisten dengan Dashboard dan lega di semua ukuran HP yang diuji.
 
 ---
 
 ## Issues
 
-### Issue #1: Viewport mobile melebar pada halaman bertabel
+### Issue #1: Arsip bahan beremoji ditolak
+
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟡 Medium |
+| **Category** | Functional |
+| **URL** | `/bahan-baku` |
+
+**Description:** Setelah validasi emoji ditambahkan, endpoint PATCH tetap memeriksa nama lama. Saat pengguna mengarsipkan bahan yang namanya sudah mengandung emoji dari data lama, permintaan ditolak dengan pesan "Emoji tidak diperbolehkan pada nama bahan baku."
+
+**Steps to Reproduce:**
+1. Buka Bahan Baku.
+2. Pilih bahan dengan nama beremoji (misalnya B017).
+3. Klik menu aksi, lalu Hapus, lalu Ya, Hapus.
+
+**Expected:** Bahan berhasil diarsipkan.
+**Actual:** Muncul peringatan validasi emoji, proses gagal.
+
+**Resolution:** Validasi nama, satuan, dan stok minimum hanya dijalankan jika field tersebut benar dikirim dalam request. Edit form juga tidak memblokir nama lama yang tidak diubah.
+
+**Verification:** Arsip B017 lewat UI berhasil dan memunculkan toast "Berhasil diarsipkan". Data uji sementara B019 dibuat, diarsipkan, lalu dihapus.
+
+---
+
+### Issue #2: Tabel halaman lain berbeda dari Dashboard
+
+| Field | Value |
+|-------|-------|
+| **Severity** | 🟡 Medium |
+| **Category** | Visual |
+
+**Description:** Tabel Dashboard memakai font 11px, header berat 600, padding 11px 20px, dan lat header abu muda. Tabel Bahan Baku dan Riwayat memakai font 10-12px, uppercase, padding berbeda.
+
+**Resolution:** CSS tabel halaman lain disamakan dengan Dashboard: font 11px, header 600 tanpa uppercase, padding 11px 20px, border dan hover sama.
+
+**Verification:** Computed style th ketiga tabel identik: 11px, 600, padding 11px 20px, letter-spacing normal, text-transform none.
+
+---
+
+### Issue #3: Tabel terlalu mepet di layar HP
 
 | Field | Value |
 |-------|-------|
 | **Severity** | 🟡 Medium |
 | **Category** | Visual / Responsive |
-| **URL** | `/bahan-baku`, `/riwayat-transaksi` |
 
-**Description:** Pada emulasi Android 390px dan iOS 393px, lebar layout viewport membengkak menjadi 693px (Bahan Baku) dan 930px (Riwayat Transaksi) karena tabel lebar tetap memengaruhi lebar dokumen meski berada di dalam wrapper `overflow-x:auto`.
+**Description:** Perbaikan overflow sebelumnya memakai padding 10px 8px sehingga sel terlihat sempit.
 
-**Steps to Reproduce:**
-1. Buka URL publik di perangkat 390px atau emulasi CDP `mobile:true`.
-2. Navigasi ke Bahan Baku atau Riwayat Transaksi.
-3. Periksa `window.innerWidth` dan `document.documentElement.scrollWidth`.
+**Resolution:** Padding mobile dinaikkan menjadi 11px 12px. Kolom kurang penting tetap disembunyikan agar tidak overflow.
 
-**Expected Behavior:** Keduanya 390px, tidak ada zoom-out otomatis.
-
-**Actual Behavior:** `innerWidth` dan `scrollWidth` menjadi 693px / 930px, membuat teks tampak lebih kecil.
-
-**Resolution:** Ditambahkan aturan mobile `table-layout:fixed`, `white-space:normal`, `width:100%`, padding sel diperkecil, dan `overflow-wrap:anywhere`. Verifikasi ulang kelima ukuran layar menunjukkan overflow 0.
-
-**Screenshot:**
-MEDIA:E:/Hermes/kedai-bangjun/prototype/qa-output/screenshots/qa-evidence.png
-
-**Console Errors:** tidak ada.
+**Verification:** Enam ukuran HP (360x800, 375x667, 390x844, 412x915, 430x932, 768x1024) menunjukkan scrollWidth sama dengan clientWidth pada Dashboard, Bahan Baku, dan Riwayat Transaksi.
 
 ---
 
-### Issue #2: Rute tidak dikenal menampilkan halaman kosong
+### Issue #4: Rute tidak dikenal kosong
 
 | Field | Value |
 |-------|-------|
 | **Severity** | 🔵 Low |
-| **Category** | UX / Navigation |
+| **Category** | UX |
 
-**Description:** Mengunjungi URL di luar rute yang didefinisikan menghasilkan body kosong; hanya `#root` berisi toast viewport.
+**Description:** /tidak-ada menampilkan body kosong.
 
-**Steps to Reproduce:**
-1. Buka `/tidak-ada`.
-2. Amati area konten.
-
-**Expected Behavior:** Muncul pesan halaman tidak ditemukan dengan navigasi kembali.
-
-**Actual Behavior:** Halaman kosong, tanpa pesan.
-
-**Resolution:** Ditambahkan route wildcard `*` yang merender placeholder "Halaman Tidak Ditemukan" di dalam layout utama.
-
-**Console Errors:** tidak ada.
+**Resolution:** Route wildcard menampilkan placeholder "Halaman Tidak Ditemukan" di dalam layout.
 
 ---
 
 ## Issues Summary Table
 
-| # | Title | Severity | Category | Status | URL |
-|---|-------|----------|----------|--------|-----|
-| 1 | Viewport mobile melebar pada tabel | 🟡 Medium | Visual | Fixed | `/bahan-baku`, `/riwayat-transaksi` |
-| 2 | Rute tidak dikenal kosong | 🔵 Low | UX | Fixed | `/tidak-ada` |
+| # | Title | Severity | Category | Status |
+|---|-------|----------|----------|--------|
+| 1 | Arsip bahan beremoji ditolak | Medium | Functional | Fixed |
+| 2 | Tabel halaman lain beda dari Dashboard | Medium | Visual | Fixed |
+| 3 | Tabel mepet di HP | Medium | Visual | Fixed |
+| 4 | Rute tidak dikenal kosong | Low | UX | Fixed |
 
 ## Testing Coverage
 
 ### Pages Tested
-- `/`, `/bahan-baku`, `/bahan-baku/tambah`, `/bahan-baku/B001`, `/bahan-baku/B001/edit`
-- `/stok-masuk`, `/stok-keluar`
-- `/riwayat-transaksi`, `/riwayat-transaksi/TX001418`
-- `/ai-assistant`, `/tidak-ada`
+Dashboard, Bahan Baku, Tambah/Edit Bahan, Stok Masuk, Stok Keluar, Riwayat Transaksi, detail transaksi, detail bahan, AI Assistant, rute tidak dikenal.
 
 ### Features Tested
-- Navigasi sidebar dan breadcrumb, keyboard Tab.
-- Pencarian, filter status, filter jenis, filter tanggal, pengurutan, pagination.
-- Tambah, edit, dan arsip bahan baku lewat dialog konfirmasi.
-- Submit stok masuk dan stok keluar, validasi form kosong, validasi stok berlebih (HTTP 400).
-- Empty state riwayat transaksi.
-- Responsive: desktop 1920, laptop 1366, tablet 768, Android 390, iOS 393.
-- Akses publik lewat tunnel dan konsistensi build dengan localhost.
+Navigasi, pencarian, filter status/jenis/tanggal, pengurutan, pagination, tambah/edit/arsip bahan, stok masuk/keluar, validasi form kosong, validasi emoji, validasi stok berlebih, empty state, integrasi Supabase, URL publik.
 
-### Not Tested / Out of Scope
-- Perangkat fisik Android/iOS (hanya emulasi CDP).
-- Browser Safari/Firefox/Edge sungguhan.
-- Panel grafik Dashboard dan AI Assistant (memang placeholder prototype).
-- Autentikasi (prototype belum punya login).
+### Not Tested
+Perangkat fisik Android/iOS, browser Safari/Firefox/Edge sungguhan, panel grafik dan AI Assistant yang memang placeholder.
 
 ### Blockers
-- Tidak ada.
+Tidak ada.
 
 ---
 
 ## Notes
 
-- Tidak ada `console.error`, uncaught exception, atau unhandled rejection pada seluruh halaman yang diuji.
-- Semua mutasi data saat QA dijalankan pada server test dan Supabase, lalu data uji dibersihkan.
-- Perbaikan sudah di-push sebagai commit `8cceeb0` (Supabase) dan commit QA berikutnya, serta terlayani di URL publik.
-- Disarankan reviewer membuka URL publik dari HP asli untuk mengonfirmasi hasil emulasi mobile.
+- Tidak ada console error pada seluruh halaman yang diuji.
+- Emoji tetap ditolak untuk input baru, tetapi data lama yang sudah mengandung emoji tidak dihapus dan bisa diarsipkan.
+- Data B017 sudah diarsipkan sesuai percobaan pengguna. B018 tidak diubah.
+- Semua perubahan sudah di-push dan terlayani di URL publik.
